@@ -24,3 +24,22 @@ protoc --go_out=. --go_opt=paths=source_relative \
   --go-grpc_out=. --go-grpc_opt=paths=source_relative \
   proto/memoservice.proto
 ```
+
+## grpcurlでの動作検証
+```bash
+brew install grpcurl
+
+# サービス一覧確認
+grpcurl -plaintext localhost:3333 list
+grpc.reflection.v1.ServerReflection
+grpc.reflection.v1alpha.ServerReflection
+service.MemoAPI
+
+# メソッド一覧確認
+grpcurl -plaintext localhost:3333 list service.MemoAPI
+service.MemoAPI.CreateMemo
+service.MemoAPI.GetMemo
+service.MemoAPI.ListMemos
+
+grpcurl -plaintext localhost:3333 service.MemoAPI.GetMemo
+```
