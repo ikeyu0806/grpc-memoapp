@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package service;
 
-option go_package = "pb/";
+option go_package = "pkg/grpc";
 
 service MemoAPI {
     rpc GetMemo(GetMemoRequest) returns (GetMemoResponse) {}
@@ -15,11 +15,11 @@ message GetMemoRequest {
 }
 
 message GetMemoResponse {
-    Memo todo = 1;
+    Memo memo = 1;
 }
 
 message CreateMemoRequest {
-    Memo todo = 1;
+    Memo emo = 1;
 }
 
 message CreateMemoResponse {
@@ -30,7 +30,7 @@ message CreateMemoResponse {
 message ListMemosRequest {}
 
 message ListMemosResponse {
-    repeated Memo todos = 1;
+    repeated Memo memos = 1;
 }
 
 message Memo {

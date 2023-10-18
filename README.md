@@ -15,5 +15,11 @@ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
 ```
 
 ```bash
-protoc --go_out=./ --go-grpc_out=require_unimplemented_servers=false:. ./proto/memoservice.proto
+protoc --go_out=../pkg/grpc --go_opt=paths=source_relative memoservice.proto --go-grpc_out=../pkg/grpc --go-grpc_opt=paths=source_relative memoservice.proto
+```
+
+```bash
+protoc --go_out=. --go_opt=paths=source_relative \
+  --go-grpc_out=. --go-grpc_opt=paths=source_relative \
+  proto/memoservice.proto
 ```
