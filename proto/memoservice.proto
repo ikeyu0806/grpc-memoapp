@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package service;
+
+option go_package = "pb/";
+
+service MemoAPI {
+    rpc GetMemo(GetMemoRequest) returns (GetMemoResponse) {}
+    rpc CreateMemo(CreateMemoRequest) returns (CreateMemoResponse) {}
+    rpc ListMemos(ListMemosRequest) returns (ListMemosResponse) {}
+}
+
+message GetMemoRequest {
+    string id = 1;
+}
+
+message GetMemoResponse {
+    Memo todo = 1;
+}
+
+message CreateMemoRequest {
+    Memo todo = 1;
+}
+
+message CreateMemoResponse {
+    bool success = 1;
+    string id = 2;
+}
+
+message ListMemosRequest {}
+
+message ListMemosResponse {
+    repeated Memo todos = 1;
+}
+
+message Memo {
+    string title = 1;
+    string description = 2;
+}
