@@ -41,5 +41,7 @@ service.MemoAPI.CreateMemo
 service.MemoAPI.GetMemo
 service.MemoAPI.ListMemos
 
+grpcurl -plaintext localhost:3333 service.MemoAPI.CreateMemo
 grpcurl -plaintext localhost:3333 service.MemoAPI.GetMemo
+grpcurl -plaintext localhost:3333 service.MemoAPI.ListMemos
 ```
