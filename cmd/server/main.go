@@ -38,8 +38,6 @@ func (s *memoServer) GetMemo(ctx context.Context, req *memopb.GetMemoRequest) (*
 }
 
 func (s *memoServer) CreateMemo(ctx context.Context, req *memopb.CreateMemoRequest) (*memopb.CreateMemoResponse, error) {
-	os.Remove("./grpc_memoapp.db")
-
 	db, err := sql.Open("sqlite3", "./grpc_memoapp.db")
 	if err != nil {
 		log.Fatal(err)
@@ -63,7 +61,7 @@ func (s *memoServer) CreateMemo(ctx context.Context, req *memopb.CreateMemoReque
 		log.Fatal(err)
 	}
 
-	stmt, err := tx.Prepare("insert into memos(title, description) values('hoge', 'huga')")
+	stmt, err := tx.Prepare("INSERT INTO memos(title, description) VALUES('hoge', 'huga');")
 	if err != nil {
 		log.Println(err)
 	}
@@ -81,24 +79,49 @@ func (s *memoServer) CreateMemo(ctx context.Context, req *memopb.CreateMemoReque
 		Id:      newMemoID,
 	}
 
+	log.Println("success CreateMemo")
 	return response, nil
 }
 
 func (s *memoServer) ListMemos(ctx context.Context, req *memopb.ListMemosRequest) (*memopb.ListMemosResponse, error) {
-	dummyMemos := []*memopb.Memo{
-		{
-			Title:       "Memo 1",
-			Description: "This is the first memo.",
-		},
-		{
-			Title:       "Memo 2",
-			Description: "This is the second memo.",
-		},
+	db, err := sql.Open("sqlite3", "./grpc_memoapp.db")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	sqlStmt := `
+	SELECT * FROM memos;
+	`
+	rows, err := db.Query(sqlStmt)
+	if err != nil {
+		log.Println(err)
+	}
+	defer rows.Close()
+
+	var grpcMemos []*memopb.Memo
+	for rows.Next() {
+		var id int
+		var title, description string
+		err := rows.Scan(&id, &title, &description)
+		if err != nil {
+			log.Println(err)
+			return nil, err
+		}
+		log.Printf("title: %v", title)
+		log.Printf("description: %v", description)
+		grpcMemo := &memopb.Memo{
+			Title:       title,
+			Description: description,
+		}
+		grpcMemos = append(grpcMemos, grpcMemo)
 	}
 
 	response := &memopb.ListMemosResponse{
-		Memos: dummyMemos,
+		Memos: grpcMemos,
 	}
+
+	log.Println("success ListMemos")
 
 	return response, nil
 }
