@@ -4,6 +4,11 @@
 docker-compose up
 ```
 
+### migration
+```bash
+docker-compose run grpc-memoapp go run cmd/migrate/main.go
+```
+
 ## protoファイルからの自動コード生成
 参考: https://grpc.io/docs/languages/go/quickstart/
 
