@@ -10,6 +10,11 @@ service MemoAPI {
     rpc ListMemos(ListMemosRequest) returns (ListMemosResponse) {}
 }
 
+message Memo {
+    string title = 1;
+    string description = 2;
+}
+
 message GetMemoRequest {
     string id = 1;
 }
@@ -19,7 +24,7 @@ message GetMemoResponse {
 }
 
 message CreateMemoRequest {
-    Memo emo = 1;
+    Memo memo = 1;
 }
 
 message CreateMemoResponse {
@@ -31,9 +36,4 @@ message ListMemosRequest {}
 
 message ListMemosResponse {
     repeated Memo memos = 1;
-}
-
-message Memo {
-    string title = 1;
-    string description = 2;
 }

@@ -41,7 +41,20 @@ service.MemoAPI.CreateMemo
 service.MemoAPI.GetMemo
 service.MemoAPI.ListMemos
 
-grpcurl -plaintext localhost:3333 service.MemoAPI.CreateMemo
+grpcurl -plaintext -d '{
+  "memo": {
+    "title": "titleDemo",
+    "description": "descriptionDemo"
+  }
+}' localhost:3333 service.MemoAPI.CreateMemo
 grpcurl -plaintext localhost:3333 service.MemoAPI.GetMemo
 grpcurl -plaintext localhost:3333 service.MemoAPI.ListMemos
+```
+
+# sqlite操作
+```
+docker exec -it grpc-memoapp_grpc-memoapp_1 bash
+sqlite3 grpc_memoapp.db
+# テーブル一覧
+.tables
 ```

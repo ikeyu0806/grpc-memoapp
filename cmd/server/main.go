@@ -61,11 +61,15 @@ func (s *memoServer) CreateMemo(ctx context.Context, req *memopb.CreateMemoReque
 		log.Fatal(err)
 	}
 
-	stmt, err := tx.Prepare("INSERT INTO memos(title, description) VALUES('hoge', 'huga');")
+	insertSqlStmt := "INSERT INTO memos(title, description) VALUES(?, ?);"
+	_, err = db.Exec(insertSqlStmt, req.Memo.Title, req.Memo.Description)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 	if err != nil {
 		log.Println(err)
 	}
-	defer stmt.Close()
 
 	err = tx.Commit()
 	if err != nil {
