@@ -61,6 +61,7 @@ grpcurl -plaintext -d '{
     "description": "updateDemo"
   }
 }' localhost:3333 service.MemoAPI.UpdateMemo
+grpcurl -plaintext -d '{"id": "1"}' localhost:3333 service.MemoAPI.DeleteMemo
 ```
 
 # sqlite操作

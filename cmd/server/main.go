@@ -33,7 +33,7 @@ func (s *memoServer) GetMemo(ctx context.Context, req *memopb.GetMemoRequest) (*
 
 	id := req.Id
 
-	row := db.QueryRow("SELECT title, description FROM memos WHERE id=?", id)
+	row := db.QueryRow("SELECT title, description FROM memos WHERE id = ?", id)
 	memo := &memopb.Memo{}
 
 	err = row.Scan(&memo.Title, &memo.Description)
@@ -49,6 +49,48 @@ func (s *memoServer) GetMemo(ctx context.Context, req *memopb.GetMemoRequest) (*
 	response := &memopb.GetMemoResponse{
 		Memo: memo,
 	}
+
+	return response, nil
+}
+
+func (s *memoServer) ListMemos(ctx context.Context, req *memopb.ListMemosRequest) (*memopb.ListMemosResponse, error) {
+	db, err := sql.Open("sqlite3", "./grpc_memoapp.db")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	sqlStmt := `
+	SELECT * FROM memos;
+	`
+	rows, err := db.Query(sqlStmt)
+	if err != nil {
+		log.Println(err)
+	}
+	defer rows.Close()
+
+	var grpcMemos []*memopb.Memo
+	for rows.Next() {
+		var id int
+		var title, description string
+		err := rows.Scan(&id, &title, &description)
+		if err != nil {
+			log.Println(err)
+			return nil, err
+		}
+
+		grpcMemo := &memopb.Memo{
+			Title:       title,
+			Description: description,
+		}
+		grpcMemos = append(grpcMemos, grpcMemo)
+	}
+
+	response := &memopb.ListMemosResponse{
+		Memos: grpcMemos,
+	}
+
+	log.Println("success ListMemos")
 
 	return response, nil
 }
@@ -126,44 +168,23 @@ func (s *memoServer) UpdateMemo(ctx context.Context, req *memopb.UpdateMemoReque
 	return response, nil
 }
 
-func (s *memoServer) ListMemos(ctx context.Context, req *memopb.ListMemosRequest) (*memopb.ListMemosResponse, error) {
+func (s *memoServer) DeleteMemo(ctx context.Context, req *memopb.DeleteMemoRequest) (*memopb.DeleteMemoResponse, error) {
 	db, err := sql.Open("sqlite3", "./grpc_memoapp.db")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
 
-	sqlStmt := `
-	SELECT * FROM memos;
-	`
-	rows, err := db.Query(sqlStmt)
+	id := req.Id
+
+	_, err = db.Exec("DELETE FROM memos WHERE id = ?", id)
 	if err != nil {
-		log.Println(err)
-	}
-	defer rows.Close()
-
-	var grpcMemos []*memopb.Memo
-	for rows.Next() {
-		var id int
-		var title, description string
-		err := rows.Scan(&id, &title, &description)
-		if err != nil {
-			log.Println(err)
-			return nil, err
-		}
-
-		grpcMemo := &memopb.Memo{
-			Title:       title,
-			Description: description,
-		}
-		grpcMemos = append(grpcMemos, grpcMemo)
+		log.Fatal(err)
 	}
 
-	response := &memopb.ListMemosResponse{
-		Memos: grpcMemos,
+	response := &memopb.DeleteMemoResponse{
+		Id: id,
 	}
-
-	log.Println("success ListMemos")
 
 	return response, nil
 }

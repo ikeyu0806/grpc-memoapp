@@ -6,9 +6,10 @@ option go_package = "pkg/grpc";
 
 service MemoAPI {
     rpc GetMemo(GetMemoRequest) returns (GetMemoResponse) {}
+    rpc ListMemos(ListMemosRequest) returns (ListMemosResponse) {}
     rpc CreateMemo(CreateMemoRequest) returns (CreateMemoResponse) {}
     rpc UpdateMemo(UpdateMemoRequest) returns (UpdateMemoResponse) {}
-    rpc ListMemos(ListMemosRequest) returns (ListMemosResponse) {}
+    rpc DeleteMemo(DeleteMemoRequest) returns (DeleteMemoResponse) {}
 }
 
 message Memo {
@@ -24,6 +25,13 @@ message GetMemoRequest {
 message GetMemoResponse {
     Memo memo = 1;
 }
+
+message ListMemosRequest {}
+
+message ListMemosResponse {
+    repeated Memo memos = 1;
+}
+
 
 message CreateMemoRequest {
     Memo memo = 1;
@@ -43,8 +51,10 @@ message UpdateMemoResponse {
     string id = 2;
 }
 
-message ListMemosRequest {}
+message DeleteMemoRequest {
+    string id = 1;
+}
 
-message ListMemosResponse {
-    repeated Memo memos = 1;
+message DeleteMemoResponse {
+    string id = 1;
 }
