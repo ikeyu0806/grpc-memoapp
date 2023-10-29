@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 type MemoAPIClient interface {
 	GetMemo(ctx context.Context, in *GetMemoRequest, opts ...grpc.CallOption) (*GetMemoResponse, error)
 	CreateMemo(ctx context.Context, in *CreateMemoRequest, opts ...grpc.CallOption) (*CreateMemoResponse, error)
+	UpdateMemo(ctx context.Context, in *UpdateMemoRequest, opts ...grpc.CallOption) (*UpdateMemoResponse, error)
 	ListMemos(ctx context.Context, in *ListMemosRequest, opts ...grpc.CallOption) (*ListMemosResponse, error)
 }
 
@@ -49,6 +50,15 @@ func (c *memoAPIClient) CreateMemo(ctx context.Context, in *CreateMemoRequest, o
 	return out, nil
 }
 
+func (c *memoAPIClient) UpdateMemo(ctx context.Context, in *UpdateMemoRequest, opts ...grpc.CallOption) (*UpdateMemoResponse, error) {
+	out := new(UpdateMemoResponse)
+	err := c.cc.Invoke(ctx, "/service.MemoAPI/UpdateMemo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *memoAPIClient) ListMemos(ctx context.Context, in *ListMemosRequest, opts ...grpc.CallOption) (*ListMemosResponse, error) {
 	out := new(ListMemosResponse)
 	err := c.cc.Invoke(ctx, "/service.MemoAPI/ListMemos", in, out, opts...)
@@ -64,6 +74,7 @@ func (c *memoAPIClient) ListMemos(ctx context.Context, in *ListMemosRequest, opt
 type MemoAPIServer interface {
 	GetMemo(context.Context, *GetMemoRequest) (*GetMemoResponse, error)
 	CreateMemo(context.Context, *CreateMemoRequest) (*CreateMemoResponse, error)
+	UpdateMemo(context.Context, *UpdateMemoRequest) (*UpdateMemoResponse, error)
 	ListMemos(context.Context, *ListMemosRequest) (*ListMemosResponse, error)
 	mustEmbedUnimplementedMemoAPIServer()
 }
@@ -77,6 +88,9 @@ func (UnimplementedMemoAPIServer) GetMemo(context.Context, *GetMemoRequest) (*Ge
 }
 func (UnimplementedMemoAPIServer) CreateMemo(context.Context, *CreateMemoRequest) (*CreateMemoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateMemo not implemented")
+}
+func (UnimplementedMemoAPIServer) UpdateMemo(context.Context, *UpdateMemoRequest) (*UpdateMemoResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateMemo not implemented")
 }
 func (UnimplementedMemoAPIServer) ListMemos(context.Context, *ListMemosRequest) (*ListMemosResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListMemos not implemented")
@@ -130,6 +144,24 @@ func _MemoAPI_CreateMemo_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MemoAPI_UpdateMemo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateMemoRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MemoAPIServer).UpdateMemo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/service.MemoAPI/UpdateMemo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MemoAPIServer).UpdateMemo(ctx, req.(*UpdateMemoRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _MemoAPI_ListMemos_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListMemosRequest)
 	if err := dec(in); err != nil {
@@ -162,6 +194,10 @@ var MemoAPI_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateMemo",
 			Handler:    _MemoAPI_CreateMemo_Handler,
+		},
+		{
+			MethodName: "UpdateMemo",
+			Handler:    _MemoAPI_UpdateMemo_Handler,
 		},
 		{
 			MethodName: "ListMemos",

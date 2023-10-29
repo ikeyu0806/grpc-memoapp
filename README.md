@@ -46,14 +46,21 @@ service.MemoAPI.CreateMemo
 service.MemoAPI.GetMemo
 service.MemoAPI.ListMemos
 
+grpcurl -plaintext -d '{"id": "1"}' localhost:3333 service.MemoAPI.GetMemo
+grpcurl -plaintext localhost:3333 service.MemoAPI.ListMemos
 grpcurl -plaintext -d '{
   "memo": {
     "title": "titleDemo",
     "description": "descriptionDemo"
   }
 }' localhost:3333 service.MemoAPI.CreateMemo
-grpcurl -plaintext -d '{"id": "1"}' localhost:3333 service.MemoAPI.GetMemo
-grpcurl -plaintext localhost:3333 service.MemoAPI.ListMemos
+grpcurl -plaintext -d '{
+  "memo": {
+    "id": "1",
+    "title": "updateDemo",
+    "description": "updateDemo"
+  }
+}' localhost:3333 service.MemoAPI.UpdateMemo
 ```
 
 # sqlite操作
