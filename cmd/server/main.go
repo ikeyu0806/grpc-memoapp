@@ -25,13 +25,29 @@ func NewMemoServer() *memoServer {
 }
 
 func (s *memoServer) GetMemo(ctx context.Context, req *memopb.GetMemoRequest) (*memopb.GetMemoResponse, error) {
-	dummyMemo := &memopb.Memo{
-		Title:       "Sample Memo",
-		Description: "This is a sample memo.",
+	db, err := sql.Open("sqlite3", "./grpc_memoapp.db")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	id := req.Id
+
+	row := db.QueryRow("SELECT title, description FROM memos WHERE id=?", id)
+	memo := &memopb.Memo{}
+
+	err = row.Scan(&memo.Title, &memo.Description)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Println("Memo not found")
+			return nil, err
+		}
+		log.Println("Error fetching memo")
+		return nil, err
 	}
 
 	response := &memopb.GetMemoResponse{
-		Memo: dummyMemo,
+		Memo: memo,
 	}
 
 	return response, nil
