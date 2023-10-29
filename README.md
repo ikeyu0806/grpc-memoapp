@@ -64,6 +64,12 @@ grpcurl -plaintext -d '{
 grpcurl -plaintext -d '{"id": "1"}' localhost:3333 service.MemoAPI.DeleteMemo
 ```
 
+# Goのクライアントコマンド実行
+```bash
+# 最後の<1>はID指定
+docker compose run grpc-memoapp go run cmd/client/main.go 1
+```
+
 # sqlite操作
 ```
 docker exec -it grpc-memoapp_grpc-memoapp_1 bash
