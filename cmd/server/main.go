@@ -44,18 +44,6 @@ func (s *memoServer) CreateMemo(ctx context.Context, req *memopb.CreateMemoReque
 	}
 	defer db.Close()
 
-	sqlStmt := `
-	CREATE TABLE IF NOT EXISTS memos (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT NOT NULL,
-    description TEXT NOT NULL
-	);
-	`
-	_, err = db.Exec(sqlStmt)
-	if err != nil {
-		log.Println(err)
-	}
-
 	tx, err := db.Begin()
 	if err != nil {
 		log.Fatal(err)
@@ -63,9 +51,6 @@ func (s *memoServer) CreateMemo(ctx context.Context, req *memopb.CreateMemoReque
 
 	insertSqlStmt := "INSERT INTO memos(title, description) VALUES(?, ?);"
 	_, err = db.Exec(insertSqlStmt, req.Memo.Title, req.Memo.Description)
-	if err != nil {
-		log.Fatalln(err)
-	}
 
 	if err != nil {
 		log.Println(err)
@@ -76,11 +61,16 @@ func (s *memoServer) CreateMemo(ctx context.Context, req *memopb.CreateMemoReque
 		log.Println(err)
 	}
 
-	newMemoID := "12345"
+	var lastInsertID string
+	// SELECT last_insert_rowid()で最後のIDが取得できないのでこの実装。今回はgRPCの実験なので深追いしない
+	err = db.QueryRow("SELECT id FROM memos ORDER BY id DESC LIMIT 1").Scan(&lastInsertID)
+	if err != nil {
+		log.Println(err)
+	}
 
 	response := &memopb.CreateMemoResponse{
 		Success: true,
-		Id:      newMemoID,
+		Id:      lastInsertID,
 	}
 
 	log.Println("success CreateMemo")
@@ -112,8 +102,7 @@ func (s *memoServer) ListMemos(ctx context.Context, req *memopb.ListMemosRequest
 			log.Println(err)
 			return nil, err
 		}
-		log.Printf("title: %v", title)
-		log.Printf("description: %v", description)
+
 		grpcMemo := &memopb.Memo{
 			Title:       title,
 			Description: description,
